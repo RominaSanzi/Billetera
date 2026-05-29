@@ -77,6 +77,19 @@ public abstract class Inversion extends Actividad {
     }
 
     @Override
+    public String detalleActividad() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("fecha: ").append(fechaHora).append("\n");
+        sb.append("origen: ").append(cuentaOrigen.getTitular().getDni())
+          .append(" (").append(cuentaOrigen.getCvu()).append(")\n");
+        sb.append("desc: ").append(descripcion()).append("\n");
+        sb.append("monto: ").append(montoInvertido).append("\n");
+        sb.append("plazo: ").append(plazoDias).append("\n");
+        sb.append(isAprobada() ? "Aprobado" : "Rechazado");
+        return sb.toString();
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("fecha: ").append(fechaConstitucion).append("\n");

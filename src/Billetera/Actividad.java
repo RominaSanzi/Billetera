@@ -40,4 +40,9 @@ public abstract class Actividad {
 
     /** Para historiales (lo implementan las subclases). */
     public abstract String detalleActividad();
+    /**
+     * Monto asociado a la actividad. Lo define cada subclase:
+     * la transferencia devuelve el monto transferido, la inversion el invertido.
+     */
+    public abstract double obtenerMonto();
 }

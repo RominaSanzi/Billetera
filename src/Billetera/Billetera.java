@@ -8,12 +8,17 @@ public class Billetera implements IBilletera {
     private Map<String, Empresa> empresas;
     private Map<String, Cuenta> cuentasPorCvu;
     private Map<String, String> cvuPorAlias;
+    private Map<Integer, Inversion> inversiones;
+    private int siguienteIdInversion = 1;
+    private static final double TASA_RENTA_FIJA_DEFAULT = 0.05;
+
 
     public Billetera() {
         usuarios = new HashMap<>();
         empresas = new HashMap<>();
         cuentasPorCvu = new HashMap<>();
         cvuPorAlias = new HashMap<>();
+        inversiones = new HashMap<>();
     }
 
     // --- metodos de Tomas (cuentas, usuarios, empresas) ---
@@ -127,23 +132,44 @@ public class Billetera implements IBilletera {
 
     @Override
     public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
-        throw new UnsupportedOperationException();
+        Cuenta cuenta = validarYDescontar(dni, cvu, monto);
+        int id = siguienteIdInversion++;
+        Inversion inv = new RentaFija(id, cuenta, plazoDias, monto, TASA_RENTA_FIJA_DEFAULT);
+        registrarInversion(inv, cuenta, monto);
+        return id;
     }
 
     @Override
     public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
             double tasa) {
-        throw new UnsupportedOperationException();
+        Cuenta cuenta = validarYDescontar(dni, cvu, monto);
+        int id = siguienteIdInversion++;
+        Inversion inv = new VinculadaADivisa(id, cuenta, plazoDias, monto, divisa, tasa);
+        registrarInversion(inv, cuenta, monto);
+        return id;
     }
 
     @Override
     public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
-        throw new UnsupportedOperationException();
+        Cuenta cuenta = validarYDescontar(dni, cvu, monto);
+        int id = siguienteIdInversion++;
+        Inversion inv = new FondoLiquidezEmpresarial(id, cuenta, plazoDias, monto);
+        registrarInversion(inv, cuenta, monto);
+        return id;
     }
 
     @Override
     public void precancelarInversion(String dni, String cvu, int idInversion) {
-        throw new UnsupportedOperationException();
+        Inversion inv = inversiones.get(idInversion);
+        if (inv == null)
+            throw new IllegalArgumentException("Inversion no existe: " + idInversion);
+        Cuenta cuenta = inv.getCuentaOrigen();
+        if (!cuenta.getCvu().equals(cvu) || !cuenta.getTitular().getDni().equals(dni))
+            throw new IllegalArgumentException("La inversion no corresponde al usuario/cuenta indicado");
+        inv.precancelar();
+        double resultado = inv.calcularResultado();
+        cuenta.depositar(inv.obtenerMonto() + resultado);
+        cuenta.getTitular().actualizarTotalInvertido(-inv.obtenerMonto());
     }
 
     @Override
@@ -163,7 +189,9 @@ public class Billetera implements IBilletera {
 
     @Override
     public double obtenerTotalInvertido(String dniUsuario) {
-        throw new UnsupportedOperationException();
+        Usuario u = buscarUsuario(dniUsuario);
+        if (u == null) throw new IllegalArgumentException("Usuario no existe");
+        return u.getTotalInvertido();
     }
 
     @Override
@@ -211,6 +239,27 @@ public class Billetera implements IBilletera {
         if (cvuPorAlias.containsKey(alias)) {
             throw new IllegalArgumentException("El alias ya esta registrado.");
         }
+    }
+
+    private Cuenta validarYDescontar(String dni, String cvu, double monto) {
+        Usuario usuario = buscarUsuario(dni);
+        if (usuario == null)
+            throw new IllegalArgumentException("Usuario no registrado: " + dni);
+        Cuenta cuenta = cuentasPorCvu.get(cvu);
+        if (cuenta == null)
+            throw new IllegalArgumentException("Cuenta no existe: " + cvu);
+        if (!cuenta.getTitular().getDni().equals(dni))
+            throw new IllegalArgumentException("La cuenta " + cvu + " no pertenece al usuario " + dni);
+        if (monto <= 0)
+            throw new IllegalArgumentException("El monto debe ser positivo");
+        cuenta.extraer(monto);
+        return cuenta;
+    }
+
+    private void registrarInversion(Inversion inv, Cuenta cuenta, double monto) {
+        inversiones.put(inv.getId(), inv);
+        cuenta.registrarActividad(inv);
+        cuenta.getTitular().actualizarTotalInvertido(monto);
     }
 
     @Override
