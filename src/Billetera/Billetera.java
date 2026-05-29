@@ -10,7 +10,7 @@ public class Billetera implements IBilletera {
     private Map<String, String> cvuPorAlias;
     private Map<Integer, Inversion> inversiones;
     private int siguienteIdInversion = 1;
-    private static final double TASA_RENTA_FIJA_DEFAULT = 0.05;
+    private static final double TASA_RENTA_FIJA_DEFAULT = 0.20;
 
 
     public Billetera() {
@@ -133,29 +133,30 @@ public class Billetera implements IBilletera {
     @Override
     public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
         Cuenta cuenta = validarYDescontar(dni, cvu, monto);
-        int id = siguienteIdInversion++;
-        Inversion inv = new RentaFija(id, cuenta, plazoDias, monto, TASA_RENTA_FIJA_DEFAULT);
+        Inversion inv = new RentaFija(siguienteIdInversion++, cuenta, plazoDias, monto, TASA_RENTA_FIJA_DEFAULT);
         registrarInversion(inv, cuenta, monto);
-        return id;
+        return inv.getId();
     }
 
     @Override
     public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
             double tasa) {
         Cuenta cuenta = validarYDescontar(dni, cvu, monto);
-        int id = siguienteIdInversion++;
-        Inversion inv = new VinculadaADivisa(id, cuenta, plazoDias, monto, divisa, tasa);
+        Inversion inv = new VinculadaADivisa(siguienteIdInversion++, cuenta, plazoDias, monto, divisa, tasa);
         registrarInversion(inv, cuenta, monto);
-        return id;
+        return inv.getId();
     }
 
     @Override
     public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
-        Cuenta cuenta = validarYDescontar(dni, cvu, monto);
-        int id = siguienteIdInversion++;
-        Inversion inv = new FondoLiquidezEmpresarial(id, cuenta, plazoDias, monto);
+        Cuenta cuenta = cuentasPorCvu.get(cvu);
+        if (!(cuenta instanceof CuentaCorporativa)) {
+            throw new IllegalArgumentException("El Fondo de Liquidez solo se invierte desde una cuenta corporativa");
+        }
+        cuenta = validarYDescontar(dni, cvu, monto);
+        Inversion inv = new FondoLiquidezEmpresarial(siguienteIdInversion++, cuenta, plazoDias, monto);
         registrarInversion(inv, cuenta, monto);
-        return id;
+        return inv.getId();
     }
 
     @Override

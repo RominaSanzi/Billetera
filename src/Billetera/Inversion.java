@@ -34,11 +34,20 @@ public abstract class Inversion extends Actividad {
     public abstract String getActivo();
 
     public double calcularResultado() {
-        double rentabilidad = calcularRentabilidadBase();
         if (!activa && precancelable) {
-            return rentabilidad / 2.0;
+            return calcularResultadoPrecancelacion();
         }
-        return rentabilidad;
+        return calcularRentabilidadBase();
+    }
+
+    protected double calcularResultadoPrecancelacion() {
+        long diasTranscurridos = obtenerDiasTranscurridos();
+        double proporcion = Math.min((double) diasTranscurridos / plazoDias, 1.0);
+        return calcularRentabilidadBase() * proporcion / 2.0;
+    }
+
+    public long obtenerDiasTranscurridos() {
+        return Utilitarios.hoy().toEpochDay() - fechaConstitucion.toEpochDay();
     }
 
     public void precancelar() {

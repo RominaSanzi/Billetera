@@ -28,7 +28,7 @@ public class Usuario {
     }
 
     public void actualizarTotalInvertido(double monto) {
-        totalInvertido = monto;
+        totalInvertido += monto;
     }
 
     public List<Cuenta> obtenerCuentasLista() {

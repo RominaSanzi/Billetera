@@ -10,36 +10,36 @@ import static org.junit.Assert.*;
 public class BilleteraTest {
     private IBilletera billetera;
 
-    // @Before
-    // public void setUp() {
-    //     billetera = new Billetera();
-    //     billetera.registrarUsuario("11111111", "Alice", "123", "a@test.com");
-    //     billetera.registrarUsuario("22222222", "Bob", "456", "b@test.com");
-    //     Utilitarios.definirHoy(LocalDate.now());
-    //     Utilitarios.actualizarCotizacion("USD", 1000);
-    //     Utilitarios.actualizarCotizacion("EUR", 1100);
-    // }
+    @Before
+    public void setUp() {
+        billetera = new Billetera();
+        billetera.registrarUsuario("11111111", "Alice", "123", "a@test.com");
+        billetera.registrarUsuario("22222222", "Bob", "456", "b@test.com");
+        Utilitarios.definirHoy(LocalDate.now());
+        Utilitarios.actualizarCotizacion("USD", 1000);
+        Utilitarios.actualizarCotizacion("EUR", 1100);
+    }
 
-    // @Test
-    // public void testCrearCuentaRegular() {
-    //     String cvu = billetera.crearCuentaRegular("11111111", "alice.regular");
-    //     List<String> cuentas = billetera.obtenerCuentas("11111111");
-    //     assertEquals(1, cuentas.size());
-    //     assertEquals(0.0, billetera.obtenerSaldoDisponible(cvu), 0.01);
-    // }
+    @Test
+    public void testCrearCuentaRegular() {
+        String cvu = billetera.crearCuentaRegular("11111111", "alice.regular");
+        List<String> cuentas = billetera.obtenerCuentas("11111111");
+        assertEquals(1, cuentas.size());
+        assertEquals(0.0, billetera.obtenerSaldoDisponible(cvu), 0.01);
+    }
 
-    // @Test(expected = IllegalArgumentException.class)
-    // public void testCrearCuentaPremiumFallaPorPocoDinero() {
-    //     billetera.crearCuentaPremium("11111111", "alice.premium", 100000);
-    // }
+    @Test(expected = IllegalArgumentException.class)
+    public void testCrearCuentaPremiumFallaPorPocoDinero() {
+        billetera.crearCuentaPremium("11111111", "alice.premium", 100000);
+    }
 
-    // @Test
-    // public void testCrearCuentaPremiumExito() {
-    //     String cvu = billetera.crearCuentaPremium("11111111", "alice.premium", 600000);
-    //     List<String> cuentas = billetera.obtenerCuentas("11111111");
-    //     assertEquals(1, cuentas.size());
-    //     assertEquals(600000.0, billetera.obtenerSaldoDisponible(cvu), 0.01);
-    // }
+    @Test
+    public void testCrearCuentaPremiumExito() {
+        String cvu = billetera.crearCuentaPremium("11111111", "alice.premium", 600000);
+        List<String> cuentas = billetera.obtenerCuentas("11111111");
+        assertEquals(1, cuentas.size());
+        assertEquals(600000.0, billetera.obtenerSaldoDisponible(cvu), 0.01);
+    }
 
     // @Test
     // public void testTransferencia() {
@@ -52,18 +52,18 @@ public class BilleteraTest {
     //     assertEquals(1, billetera.consultarHistorialCuenta(cvuBob).size());
     // }
 
-    // @Test
-    // public void testInversionYSaldoDisponible() {
-    //     String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p", 2000000);
-    //     billetera.realizarInversionRentaFija("11111111", cvuAlice, 500000, 30);
-    //     double invertidoMasDisponible = billetera.obtenerSaldoDisponible(cvuAlice)
-    //             + billetera.obtenerTotalInvertido("11111111");
-    //     assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    //     assertEquals(1500000.0, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
-    //     assertEquals(2000000.0, invertidoMasDisponible, 0.01);
-    //     billetera.realizarInversionDivisa("11111111", cvuAlice, 100000, 60, "USD", 0.05);
-    //     assertEquals(600000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    // }
+    @Test
+    public void testInversionYSaldoDisponible() {
+        String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p", 2000000);
+        billetera.realizarInversionRentaFija("11111111", cvuAlice, 500000, 30);
+        double invertidoMasDisponible = billetera.obtenerSaldoDisponible(cvuAlice)
+                + billetera.obtenerTotalInvertido("11111111");
+        assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+        assertEquals(1500000.0, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
+        assertEquals(2000000.0, invertidoMasDisponible, 0.01);
+        billetera.realizarInversionDivisa("11111111", cvuAlice, 100000, 60, "USD", 0.05);
+        assertEquals(600000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+    }
 
     // @Test
     // public void testTopCuentasPorVolumenDeTransacciones() {
@@ -84,64 +84,64 @@ public class BilleteraTest {
     //     billetera.realizarTransferencia(cvuAlice, cvuBob, 5100000);
     // }
 
-    // @Test(expected = IllegalArgumentException.class)
-    // public void testRestriccionFondoLiquidez() {
-    //     String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p", 5000000);
-    //     billetera.realizarInversionLiquidez("11111111", cvuAlice, 5000000, 30);
-    // }
+    @Test(expected = IllegalArgumentException.class)
+    public void testRestriccionFondoLiquidez() {
+        String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p", 5000000);
+        billetera.realizarInversionLiquidez("11111111", cvuAlice, 5000000, 30);
+    }
 
-    // @Test
-    // public void testRegistrarEmpresaYCuentaCorporativa() {
-    //     billetera.registrarEmpresa("30-12345678-9", "Empresa SA", "11223344", "contacto@empresa.com", "Juan");
-    //     billetera.agregarPersonaAutorizada("30-12345678-9", "11111111");
-    //     String cvuCorp = billetera.crearCuentaCorporativa("11111111", "empresa.corp", "30-12345678-9");
-    //     List<String> cuentas = billetera.obtenerCuentas("11111111");
-    //     assertEquals(1, cuentas.size());
-    //     assertTrue(cuentas.get(0).contains(cvuCorp));
-    // }
+    @Test
+    public void testRegistrarEmpresaYCuentaCorporativa() {
+        billetera.registrarEmpresa("30-12345678-9", "Empresa SA", "11223344", "contacto@empresa.com", "Juan");
+        billetera.agregarPersonaAutorizada("30-12345678-9", "11111111");
+        String cvuCorp = billetera.crearCuentaCorporativa("11111111", "empresa.corp", "30-12345678-9");
+        List<String> cuentas = billetera.obtenerCuentas("11111111");
+        assertEquals(1, cuentas.size());
+        assertTrue(cuentas.get(0).contains(cvuCorp));
+    }
 
-    // @Test
-    // public void testConsultarCvu() {
-    //     String cvu = billetera.crearCuentaRegular("11111111", "alice.regular.alias");
-    //     String cvuConsultado = billetera.consultarCvu("alice.regular.alias");
-    //     assertEquals(cvu, cvuConsultado);
-    // }
+    @Test
+    public void testConsultarCvu() {
+        String cvu = billetera.crearCuentaRegular("11111111", "alice.regular.alias");
+        String cvuConsultado = billetera.consultarCvu("alice.regular.alias");
+        assertEquals(cvu, cvuConsultado);
+    }
 
-    // @Test(expected = IllegalArgumentException.class)
-    // public void testConsultarCvuInexistenteLanzaError() {
-    //     billetera.consultarCvu("alias.inexistente");
-    // }
+    @Test(expected = IllegalArgumentException.class)
+    public void testConsultarCvuInexistenteLanzaError() {
+        billetera.consultarCvu("alias.inexistente");
+    }
 
-    // @Test
-    // public void testPrecancelarInversionRentaFija() {
-    //     String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p.inv", 2000000);
-    //     int idInversion = billetera.realizarInversionRentaFija("11111111", cvuAlice, 500000, 30);
-    //     assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    //     Utilitarios.definirHoy(Utilitarios.hoy().plusDays(20));
-    //     billetera.precancelarInversion("11111111", cvuAlice, idInversion);
-    //     assertEquals(0.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    //     double interesesEsperados = 500000 * (0.20 / 365) * 20;
-    //     double saldoEsperado = 2000000D;
-    //     saldoEsperado += interesesEsperados / 2;
-    //     assertEquals(saldoEsperado, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
-    // }
+    @Test
+    public void testPrecancelarInversionRentaFija() {
+        String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p.inv", 2000000);
+        int idInversion = billetera.realizarInversionRentaFija("11111111", cvuAlice, 500000, 30);
+        assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+        Utilitarios.definirHoy(Utilitarios.hoy().plusDays(20));
+        billetera.precancelarInversion("11111111", cvuAlice, idInversion);
+        assertEquals(0.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+        double interesesEsperados = 500000 * (0.20 / 365) * 20;
+        double saldoEsperado = 2000000D;
+        saldoEsperado += interesesEsperados / 2;
+        assertEquals(saldoEsperado, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
+    }
 
-    // @Test
-    // public void testPrecancelarInversionDivisa() {
-    //     String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p.inv", 2000000);
-    //     int idInversion = billetera.realizarInversionDivisa("11111111", cvuAlice, 500000, 30, "USD", 0.03);
-    //     assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    //     double divisasEquivalente = 500000 / Utilitarios.consultarCotizacion("USD");
-    //     Utilitarios.definirHoy(Utilitarios.hoy().plusDays(20));
-    //     Utilitarios.actualizarCotizacion("USD", 1060);
-    //     billetera.precancelarInversion("11111111", cvuAlice, idInversion);
-    //     assertEquals(0.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
-    //     double interesesEnDivisas = divisasEquivalente * (0.03 / 365) * 20;
-    //     double saldoEsperado = 2000000D - 500000;
-    //     interesesEnDivisas /= 2;
-    //     saldoEsperado += (divisasEquivalente + interesesEnDivisas) * Utilitarios.consultarCotizacion("USD");
-    //     assertEquals(saldoEsperado, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
-    // }
+    @Test
+    public void testPrecancelarInversionDivisa() {
+        String cvuAlice = billetera.crearCuentaPremium("11111111", "alice.p.inv", 2000000);
+        int idInversion = billetera.realizarInversionDivisa("11111111", cvuAlice, 500000, 30, "USD", 0.03);
+        assertEquals(500000.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+        double divisasEquivalente = 500000 / Utilitarios.consultarCotizacion("USD");
+        Utilitarios.definirHoy(Utilitarios.hoy().plusDays(20));
+        Utilitarios.actualizarCotizacion("USD", 1060);
+        billetera.precancelarInversion("11111111", cvuAlice, idInversion);
+        assertEquals(0.0, billetera.obtenerTotalInvertido("11111111"), 0.01);
+        double interesesEnDivisas = divisasEquivalente * (0.03 / 365) * 20;
+        double saldoEsperado = 2000000D - 500000;
+        interesesEnDivisas /= 2;
+        saldoEsperado += (divisasEquivalente + interesesEnDivisas) * Utilitarios.consultarCotizacion("USD");
+        assertEquals(saldoEsperado, billetera.obtenerSaldoDisponible(cvuAlice), 0.01);
+    }
 
     // @Test
     // public void testConsultarHistorialGlobal() {
